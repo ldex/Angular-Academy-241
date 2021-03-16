@@ -13,7 +13,7 @@ import { Product } from '../product.interface';
 export class ProductListComponent implements OnInit, OnDestroy {
 
   title = 'Products';
-  products: Product[];
+  //products: Product[];
   products$: Observable<Product[]>;
   selectedProduct: Product;
   subscription: Subscription = new Subscription();

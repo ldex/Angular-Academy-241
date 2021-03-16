@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { ProductService } from 'src/app/services/product.service';
 import { Product } from '../product.interface';
 
@@ -10,21 +12,39 @@ import { Product } from '../product.interface';
 })
 export class ProductDetailComponent implements OnInit {
 
-  @Input() product: Product;
+  product$: Observable<Product>;
 
   constructor(
     private activatedRoute: ActivatedRoute,
-    private productService: ProductService
+    private productService: ProductService,
+    private router: Router
   ) { }
+
+  delete(id: number) {
+    if(window.confirm('Are you sure ?')) {
+      this
+      .productService
+      .deleteProduct(id)
+      .subscribe(
+        () => {
+          console.log('Product deleted on server!');
+          this.productService.initProducts();
+          this.router.navigateByUrl('/products');
+        },
+        error => console.error('Could not delete product with error: ' + error)
+      )
+    }
+  }
 
   ngOnInit(): void {
     let id = this.activatedRoute.snapshot.params['id'];
-    this
-      .productService
-      .getProductById(id)
-      .subscribe(
-        result => this.product = result
-      )
+    this.product$ = this
+                      .productService
+                      .getProductById(id);
+
+      // .subscribe(
+      //   result => this.product = result
+      // )
   }
 
 }
